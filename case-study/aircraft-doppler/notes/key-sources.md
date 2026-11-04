@@ -1,0 +1,28 @@
+# Key sources (read 2026-11-03 ~02:50 UTC, index unless noted)
+
+- Video itself (description = primary for methodology): https://www.youtube.com/watch?v=UytYrhYLOKI — 200m grid, DEM slant distance, 920s two-flyover offset, emission-time radial velocity from interpolated ADS-B, ICAO type-code prop/jet filter, 1-min known-time US-wide repeat ranked true location 1st, "No code or tools are being released". Clipzag mirror says 586K views, 13h ago. Title in index also rendered "...(and no one knows about it)".
+- Channel listing: https://clipzag.com/channel?id=UCyeWuyC3eSJgmOEyDCpZbPw — thunder videos 418K (2mo) & 90K (1mo), animal abuse 2.7M, One Piece 613K, Tate 879K, Primitive Technology 26K.
+- Thunder fan video desc: https://clipzag.com/watch?v=6a7Z0I3LAnE — 2.2km error, Met Norway API ~200m vs Blitzortung ~3km, ~500m feasible claim.
+- Thunder first video desc: https://clipzag.com/watch?v=SnbkIm56TfI — Blitzortung logged 3wks, bandpass 20-250Hz, FFT cross-correlation, blind validation, inspired by Benn Jordan infrasound.
+- thunderprint PyPI https://pypi.org/project/thunderprint/ — independent implementation, "baseline method comes from colsto's videos", Blitzortung ~3km, Frost ~200m.
+- Ferguson 1992 JASA via Mendeley https://www.mendeley.com/catalogue/2cd19f7e-cbeb-3f50-a337-e7046f815359/ — single-mic Doppler blade-rate -> altitude+speed.
+- Seppi et al 2025 Seismic Record https://pubs.geoscienceworld.org/ssa/tsr/article/5/4/330/688104/Classification-of-Aircraft-Types-Using-Seismic + supplement PDF (retarded-time eq: t vs t', Fa/Fr->speed, slope->d0, c=320) — 1216 flights, Flightradar24 ground truth, prop/jet/piston discrimination, RPM changes alter signatures.
+- US Patent 8,059,489 acoustic airport surveillance — Doppler CPA processing estimates CPA time, slant range, speed.
+- InterNoise 2014 propeller model http://www.acoustics.asn.au/conference_proceedings/INTERNOISE2014/papers/p791.pdf — BPF ~100Hz, high amplitude, harmonics, atmosphere low-pass.
+- Buckingham/SciELO http://www.scielo.cl/scielo.php?script=sci_arttext&pid=S0717-65382004000200013 — fundamental ~100Hz, first ~10 harmonics detectable even in seabed sensors, Doppler comb technique.
+- ERAU aeroacoustics https://eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/noise-of-flight-vehicles/ — retarded time definition.
+- ADS-B Exchange data products https://www.adsbexchange.com/data-products/ — subscription only, annual minimum, NO one-time/project extracts, backfill to subscribers. Sample data page: archive 5s since Mar 2020, free 1st-of-month.
+- FAA mandate scope via 14 CFR 91.225 summaries (legalclarity citing eCFR) — A/B/C, Mode C veil, E >=10,000ft MSL; outside = not required.
+- LADD: FAA via uasnewsus/ops.group — LADD only filters FAA SWIM feed, does NOT affect ADS-B broadcast; crowdsourced unfiltered nets still see aircraft.
+- ICAO Doc 8643 description: 3rd char P=piston, T=turboprop, J=jet (VATSIM KB / EUROCONTROL trrrj).
+- adsb.lol scale: marksblogg — 1.6-1.8GB tar/day global, ~45 parquet x 1M records/day; ClickHouse adsb.exposed — ADSBx ~1.2B records/day, adsb.lol 30-50M/day.
+- ENF localization: Garg/Hajj-Ahmad/Wu ICASSP13 https://terpconnect.umd.edu/~minwu/public_paper/Conf13/1305_ENFLocalize_icassp13.pdf ; NGA Soundscapes https://www.nga.mil/news/NGA_announces_winners_of_$100000_Soundscapes_Compe.html (2020, city-level).
+- EVS Nokia white paper https://www.nokia.com/asset/f/200002/ — EVS HP filter only ~20Hz, bandwidths to 20kHz fullband, generic audio.
+- Opus Xiph settings https://wiki.xiph.org/index.php?title=Opus_Recommended_Settings — fullband 3-20,000Hz.
+- Noise suppression: RNNoise removes steady hum/fan "almost completely" (stayput.dev / audiosaw spectral gating) — cuts against claim 8c for steady tones; Doppler tone is non-stationary though.
+- Voice band: male F0 85-180Hz, female 165-255Hz; telephony band 300-3400Hz.
+- Hearing: ISO226 threshold at 100Hz = 26.5 dB SPL (vs ~0 at 1-4kHz); AES equal-loudness: 100Hz needs ~20dB more SPL.
+- Phone mics: PMC smartphone study https://pmc.ncbi.nlm.nih.gov/articles/PMC10545813/ — tested phones: emphasis 85-140Hz, rolloff only below ~30Hz, flat to 15kHz.
+- HN: Algolia — story 50340279 "Geolocation leak using plane doppler curves" 32pts, 2 comments, both enthusiastic ("coolest thing I've ever seen on YouTube", "three letter agencies have been using this forever"); second post 50344762 9pts 1 comment. Lobsters also posted. No tech press found day one.
+- BoingBoing (Grant St Clair, 15 Jul 2026) covered colsto animal-abuse geolocation positively (via muckrack/zicos snippets).
+- One Piece press (LADbible/GamesRadar) credits Reddit user XilLive, not colsto, for Suruga Bay theory — colsto's own video claim unverified independently.

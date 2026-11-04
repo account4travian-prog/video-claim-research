@@ -1,0 +1,28 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+*credentials*
+*token*
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Media intermediates (keep evidence frames/transcripts only)
+*.wav
+*.mp4
+*.webm
+*.mkv
+*.m4a
+*.mp3
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

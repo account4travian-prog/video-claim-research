@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Video Claims Synthesis — The Airplane Sound That Leaks Your Location</title>
+    <style>
+      :root {
+        --bg: #f7f4ee;
+        --surface: #fffdf8;
+        --surface-2: #efe9dd;
+        --ink: #1c1a16;
+        --ink-2: #57503f;
+        --ink-3: #8a8170;
+        --line: #ddd3bf;
+        --accent: #b45309;
+        --accent-ink: #92400e;
+        --good: #2f7d4f;
+        --good-bg: #e3f0e6;
+        --part: #a16207;
+        --part-bg: #f7ecd2;
+        --mixed: #9a3412;
+        --mixed-bg: #fbe7da;
+        --unv: #5b6472;
+        --unv-bg: #e6e9ee;
+        --code-bg: #ece5d4;
+        --chart-grid: #d8cfb9;
+        --chart-curve: #b45309;
+        --chart-curve2: #2563eb;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #131109;
+          --surface: #1d1a12;
+          --surface-2: #26221a;
+          --ink: #ece5d3;
+          --ink-2: #b3a98f;
+          --ink-3: #857c66;
+          --line: #3a3423;
+          --accent: #f0a840;
+          --accent-ink: #f5bc63;
+          --good: #6fce8f;
+          --good-bg: #1c3325;
+          --part: #e8c34d;
+          --part-bg: #38300f;
+          --mixed: #f0915e;
+          --mixed-bg: #3d2317;
+          --unv: #a7b0bf;
+          --unv-bg: #262b33;
+          --code-bg: #2b2718;
+          --chart-grid: #3a3423;
+          --chart-curve: #f0a840;
+          --chart-curve2: #7aa5f8;
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 17px;
+        line-height: 1.6;
+      }
+      .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px 80px; }
+      h1, h2, h3 { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; line-height: 1.15; font-weight: 700; }
+      h2 { font-size: 30px; margin: 56px 0 6px; letter-spacing: -0.01em; }
+      h3 { font-size: 21px; margin: 30px 0 6px; }
+      p { margin: 10px 0; }
+      a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+      .small { font-size: 14px; color: var(--ink-2); }
+      .kicker {
+        font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--accent-ink); margin: 0 0 10px;
+      }
+      /* ---------- hero ---------- */
+      header.hero { padding: 44px 0 8px; border-bottom: 2px solid var(--ink); }
+      header.hero h1 { font-size: clamp(30px, 5.4vw, 46px); margin: 0 0 14px; }
+      .lede { font-size: 20px; line-height: 1.5; color: var(--ink); max-width: 46em; }
+      .meta-row {
+        display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 22px 0 18px;
+        font-size: 14px; color: var(--ink-2);
+      }
+      .meta-row b { color: var(--ink); font-weight: 600; }
+      .verdict-banner {
+        background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--accent);
+        padding: 18px 20px; margin: 24px 0 8px; border-radius: 4px;
+      }
+      .verdict-banner p { margin: 0; font-size: 17px; }
+      .verdict-banner strong { color: var(--accent-ink); }
+      /* ---------- nav chips ---------- */
+      nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 4px; }
+      nav.toc a {
+        font-size: 13.5px; font-weight: 600; color: var(--ink-2); text-decoration: none;
+        border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; background: var(--surface);
+      }
+      nav.toc a:hover { color: var(--accent-ink); border-color: var(--accent); }
+      /* ---------- scoreboard ---------- */
+      .scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 8px; }
+      @media (max-width: 640px) { .scoreboard { grid-template-columns: 1fr; } }
+      .score-card {
+        background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+        padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+      }
+      .score-card .claim-name { font-weight: 650; font-size: 16px; line-height: 1.35; }
+      .score-card .claim-sub { font-size: 13.5px; color: var(--ink-2); line-height: 1.45; }
+      .badge {
+        align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+        text-transform: uppercase; padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+      }
+      .b-good { background: var(--good-bg); color: var(--good); }
+      .b-part { background: var(--part-bg); color: var(--part); }
+      .b-mixed { background: var(--mixed-bg); color: var(--mixed); }
+      .b-unv { background: var(--unv-bg); color: var(--unv); }
+      /* ---------- pipeline ---------- */
+      .pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0 6px; }
+      @media (max-width: 640px) { .pipeline { grid-template-columns: 1fr; } }
+      .step {
+        background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px;
+      }
+      .step .n {
+        font-family: Georgia, serif; font-size: 22px; color: var(--accent); font-weight: 700; line-height: 1;
+      }
+      .step h4 { margin: 8px 0 4px; font-size: 16px; }
+      .step p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.5; }
+      /* ---------- interactive model ---------- */
+      .model-box {
+        background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+        padding: 20px; margin: 22px 0 8px;
+      }
+      .model-box svg { width: 100%; height: auto; display: block; }
+      .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; margin-top: 16px; }
+      @media (max-width: 640px) { .controls { grid-template-columns: 1fr; } }
+      .control label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+      .control label output { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; color: var(--accent-ink); }
+      .control input[type="range"] { width: 100%; accent-color: var(--accent); }
+      .control .hint { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+      .readouts { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 14.5px; }
+      .readouts b { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent-ink); }
+      .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13.5px; color: var(--ink-2); margin-top: 10px; }
+      .swatch { display: inline-block; width: 22px; height: 3px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+      /* ---------- claim articles ---------- */
+      article.claim {
+        background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+        padding: 22px 24px; margin: 18px 0;
+      }
+      article.claim .claim-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; margin-bottom: 4px; }
+      article.claim h3 { margin: 0; flex: 1 1 320px; }
+      article.claim ul { margin: 8px 0; padding-left: 22px; }
+      article.claim li { margin: 6px 0; }
+      .src { font-size: 13.5px; color: var(--ink-2); }
+      .src::before { content: "Source: "; font-weight: 600; }
+      blockquote {
+        margin: 14px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--accent);
+        font-style: italic; color: var(--ink-2);
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em;
+        background: var(--code-bg); padding: 1px 5px; border-radius: 4px;
+      }
+      /* ---------- tables / lists ---------- */
+      .fail-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0 6px; }
+      @media (max-width: 640px) { .fail-list { grid-template-columns: 1fr; } }
+      .fail-item { background: var(--surface-2); border-radius: 6px; padding: 13px 16px; font-size: 15px; }
+      .fail-item b { display: block; margin-bottom: 3px; }
+      .fail-item p { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+      .open-q { background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 16px 22px; margin: 16px 0; }
+      .open-q ul { margin: 6px 0; padding-left: 22px; }
+      .open-q li { margin: 5px 0; }
+      ol.sources { font-size: 14px; color: var(--ink-2); padding-left: 24px; }
+      ol.sources li { margin: 7px 0; overflow-wrap: anywhere; }
+      footer { margin-top: 60px; border-top: 1px solid var(--line); padding-top: 16px; font-size: 13.5px; color: var(--ink-3); }
+      .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; }
+      @media (max-width: 640px) { .twocol { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <header class="hero">
+        <p class="kicker">Claim-by-claim investigation</p>
+        <h1>The airplane hum in your recording can pinpoint where it was made</h1>
+        <p class="lede">
+          A YouTube video claims that the faint, often inaudible drone of a passing propeller plane —
+          buried in the background of an ordinary recording — encodes enough information to locate that
+          recording to within about 100 metres, anywhere in the continental US, using public flight-tracking
+          archives. This page checks every claim in the video against the published literature and primary
+          sources, and synthesises what the method is, whether it works, and what it means.
+        </p>
+        <div class="meta-row">
+          <span><b>Video:</b> “I discovered a sound that leaks your exact location (and it’s everywhere)”</span>
+          <span><b>Creator:</b> colsto (pseudonymous)</span>
+          <span><b>Published:</b> 2 Nov 2026</span>
+          <span><b>Reach:</b> ~586K views within ~13 hours (channel mirror, 3 Nov 2026)</span>
+          <span><b>Watch:</b> <a href="https://www.youtube.com/watch?v=UytYrhYLOKI">youtube.com/watch?v=UytYrhYLOKI</a></span>
+        </div>
+        <div class="verdict-banner">
+          <p><strong>Bottom line:</strong> The physics and every building block of the method are real,
+          textbook, and in several cases decades old. The headline demonstration — an unknown recording
+          located to ~100 m, continent-wide — rests, as of 3 Nov 2026, only on the creator’s own video.
+          He released no code or data, and no independent replication or expert review had appeared within
+          the first day. The claims are mostly <em>supported</em> at the level of principle,
+          <em>partially supported</em> where the video generalises, and the ~100 m result itself is
+          <em>unverifiable</em> from outside so far.</p>
+        </div>
+        <nav class="toc">
+          <a href="#how">How it works</a>
+          <a href="#model">Try the physics</a>
+          <a href="#scoreboard">Verdict scoreboard</a>
+          <a href="#claims">Claim by claim</a>
+          <a href="#prior-art">Prior art</a>
+          <a href="#creator">The creator</a>
+          <a href="#defenses">Defenses</a>
+          <a href="#limits">Limits &amp; failure modes</a>
+          <a href="#implications">Implications</a>
+          <a href="#open">Open questions</a>
+          <a href="#sources">Sources</a>
+        </nav>
+      </header>
+
+      <section id="how">
+        <h2>What this is, and how it works</h2>
+        <p>
+          A propeller aircraft radiates a strong, steady tone at its blade-pass frequency — typically around
+          100 Hz — plus a ladder of harmonics. As the plane approaches, passes overhead, and recedes, the
+          Doppler effect bends that tone: high on approach, dropping through the true frequency at the
+          closest point of approach (CPA), low on departure. Plotted on a spectrogram, each flyover draws a
+          distinctive S-shaped curve. That curve is a fingerprint of the plane’s speed and its closest
+          distance to the microphone — and every commercial and most general-aviation flights broadcast
+          their position, altitude, and velocity about once a second via ADS-B, in archives anyone can
+          obtain. The method inverts the usual problem: instead of asking “where is that plane?”, it asks
+          “given this curve, where must the microphone have been?”
+        </p>
+        <p>The pipeline, as documented in the video’s own description:</p>
+        <div class="pipeline">
+          <div class="step">
+            <div class="n">1</div>
+            <h4>Extract the curves</h4>
+            <p>From the recording’s spectrogram, pull the Doppler curve of each propeller flyover — the
+            fundamental near 100–130 Hz or any clean harmonic.</p>
+          </div>
+          <div class="step">
+            <div class="n">2</div>
+            <h4>Measure speed &amp; distance</h4>
+            <p>The total frequency drop gives the aircraft’s speed; how sharply the curve transitions at
+            CPA gives the slant distance from plane to microphone.</p>
+          </div>
+          <div class="step">
+            <div class="n">3</div>
+            <h4>Pull the flight archive</h4>
+            <p>Historical ADS-B for the recording’s date, filtered in Python by ICAO type code to keep
+            propeller aircraft and drop jets.</p>
+          </div>
+          <div class="step">
+            <div class="n">4</div>
+            <h4>Filter candidates</h4>
+            <p>On a 200 m candidate grid, keep only points consistent with the measured curves — in the main
+            demo, two flyovers separated by exactly 920 seconds, plus a “silence” constraint where no
+            flyover should be heard.</p>
+          </div>
+          <div class="step">
+            <div class="n">5</div>
+            <h4>Forward-model the survivors</h4>
+            <p>For each surviving candidate, simulate the exact curve: CPA and sound-propagation delay from
+            3D slant distance using a digital elevation model, and radial velocity at the time the sound
+            was <em>emitted</em>, interpolated from ADS-B.</p>
+          </div>
+          <div class="step">
+            <div class="n">6</div>
+            <h4>Score and rank</h4>
+            <p>A locked two-event scoring method ranks candidate locations. A repeat run on a single
+            1-minute clip of known time, searched US-wide, reportedly ranked the true location 1st.</p>
+          </div>
+        </div>
+        <p class="small">One honesty note from the creator himself: “No code or tools are being released.”
+        Everything about the final result therefore has to be taken on the strength of the video and its
+        unusually detailed description.</p>
+      </section>
+
+      <section id="model">
+        <h2>Try the physics yourself</h2>
+        <p>
+          This is the core of Claim 2 and Claim 3, as an interactive model. A plane flies a straight line
+          at constant speed past a microphone. The <strong>amber curve</strong> is the physically correct
+          prediction: frequency computed from the plane’s radial velocity at the moment each bit of sound
+          was <em>emitted</em> (sound takes seconds to arrive, and the plane moves hundreds of metres in
+          that time). The <strong>blue curve</strong> is the naive version, using the plane’s position when
+          the sound is <em>received</em>. They are not the same curve shifted in time — the transition
+          region is warped asymmetrically, which is exactly why the video insists on emission-time
+          modelling. Drag the sliders: a faster plane widens the total drop; a closer pass makes the
+          transition steeper.
+        </p>
+        <div class="model-box">
+          <svg id="chart" viewBox="0 0 720 340" role="img" aria-label="Modelled Doppler frequency curve for an aircraft flyover"></svg>
+          <div class="legend">
+            <span><span class="swatch" style="background:var(--chart-curve)"></span>Emission-time model (correct)</span>
+            <span><span class="swatch" style="background:var(--chart-curve2)"></span>Reception-time model (naive)</span>
+          </div>
+          <div class="controls">
+            <div class="control">
+              <label>Aircraft speed <output id="o-speed"></output></label>
+              <input type="range" id="r-speed" min="40" max="120" step="1" value="70" />
+              <div class="hint">Total frequency drop is set by speed alone.</div>
+            </div>
+            <div class="control">
+              <label>Closest distance (slant) <output id="o-dist"></output></label>
+              <input type="range" id="r-dist" min="500" max="8000" step="100" value="2500" />
+              <div class="hint">Closer pass → sharper S-bend at closest approach.</div>
+            </div>
+            <div class="control">
+              <label>Tone frequency <output id="o-freq"></output></label>
+              <input type="range" id="r-freq" min="80" max="160" step="1" value="115" />
+              <div class="hint">Blade-pass fundamental, typically ~100–130 Hz.</div>
+            </div>
+          </div>
+          <div class="readouts">
+            <span>Approach frequency: <b id="ro-fa"></b></span>
+            <span>Receding frequency: <b id="ro-fr"></b></span>
+            <span>Total drop: <b id="ro-drop"></b></span>
+            <span>Sound delay at closest approach: <b id="ro-delay"></b></span>
+          </div>
+        </div>
+        <p class="small">Illustrative forward model (straight, level, constant-speed pass; sound speed
+        343 m/s). Real passes add turns, climb/descent and RPM changes — and per Claim 2, those deviations
+        are themselves information, not noise.</p>
+      </section>
+
+      <section id="scoreboard">
+        <h2>Verdict scoreboard</h2>
+        <p>Nine claims checked. Detail and sources for each are in the sections that follow.</p>
+        <div class="scoreboard">
+          <div class="score-card">
+            <span class="badge b-good">Supported</span>
+            <div class="claim-name">1 · The propeller tone</div>
+            <div class="claim-sub">~100 Hz fundamental + harmonics, often inaudible yet spectrogram-visible, penetrates buildings.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-good">Supported</span>
+            <div class="claim-name">2 · The curve encodes speed &amp; distance</div>
+            <div class="claim-sub">Total drop → speed; transition rate → CPA slant distance; deviations encode turns, accel, RPM. Established, published method.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-good">Supported</span>
+            <div class="claim-name">3 · Emission-time modelling is required</div>
+            <div class="claim-sub">Retarded time is standard aeroacoustics; reception-time velocity warps the curve, not just shifts it.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-part">Partially supported</span>
+            <div class="claim-name">4 · ADS-B archives cover “essentially all flights”</div>
+            <div class="claim-sub">Data and prop/jet type-code mapping are real; coverage has mandate, equipage and receiver gaps, and purchase is more restricted than stated.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-part">Partially supported</span>
+            <div class="claim-name">5 · Earlier thunder geolocation at ~5 km</div>
+            <div class="claim-sub">Both thunder videos exist; kilometre-scale accuracy documented (2.2 km on the fan video). The exact “~5 km” figure is unverifiable.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-mixed">Mixed</span>
+            <div class="claim-name">6 · Creator credibility</div>
+            <div class="claim-sub">Documented track record and one independent open-source replication — but pseudonymous, no peer review, some headline finds unverified.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-part">Novel demo, old parts</span>
+            <div class="claim-name">7 · Is it new?</div>
+            <div class="claim-sub">Every component is 30+ years old in the literature. Locating an unknown consumer recording against continent-wide archives appears to be a novel public demonstration.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-part">Partially supported</span>
+            <div class="claim-name">8 · The defenses don’t save you</div>
+            <div class="claim-sub">High-pass filtering: unreliable as a casual fix, overstated if read as impossible. Loud speech: doesn’t block extraction. Codec + noise-suppression survival: plausible for codecs, unverified for suppression.</div>
+          </div>
+          <div class="score-card">
+            <span class="badge b-good">Feasible, with caveats</span>
+            <div class="claim-name">9 · A hobbyist could replicate it</div>
+            <div class="claim-sub">Free ADS-B history now exists and the compute is cheap — provided the date is known and a suitable prop flyover is actually in the data.</div>
+          </div>
+        </div>
+        <div class="verdict-banner">
+          <p><strong>And the headline itself — ~100 m accuracy, true location ranked 1st US-wide:</strong>
+          <span class="badge b-unv" style="vertical-align: middle;">Unverifiable</span></p>
+          <p style="margin-top:8px;">Asserted only in the video and its description. No code, no data, no
+          independent replication exists yet — the creator explicitly withholds the code. Unverifiable is
+          not the same as contradicted: nothing found in the literature says it shouldn’t work.</p>
+        </div>
+      </section>
+
+      <section id="claims">
+        <h2>Claim by claim</h2>
+
+        <article class="claim">
+          <div class="claim-head">
+            <h3>1 · The propeller tone: ~100–130 Hz, often inaudible, goes through walls</h3>
+            <span class="badge b-good">Supported</span>
+          </div>
+          <p>Propeller noise is dominated by a fundamental tone at the blade-pass frequency (rotation rate ×
+          number of blades) plus diminishing harmonics. The literature puts that fundamental “typically
+          around 100 Hz,” with the exact value varying by type and RPM. At cruise altitudes the
+          Doppler-shifted blade-pass tone and its low harmonics are the principal component heard on the
+          ground, because the atmosphere acts as a low-pass filter that favours exactly these low
+          frequencies.</p>
+          <ul>
+            <li><strong>Inaudible but measurable is physiologically normal.</strong> The hearing threshold
+            at 100 Hz is ~26.5 dB SPL (vs ~0 dB at 1–4 kHz); a 100 Hz tone needs roughly 20 dB more level
+            than a 1 kHz tone to sound equally loud. A tone can sit well above a microphone’s noise floor
+            while remaining below conscious perception, especially masked by indoor ambient sound.</li>
+            <li><strong>It really is everywhere.</strong> In one acoustical-oceanography study, the first
+            ~10 harmonics of a light aircraft were detectable in air, in the water column, and on sensors
+            buried ~1 m in the seabed.</li>
+            <li><strong>Building penetration is standard acoustics:</strong> low-frequency sound travels
+            long distances and passes through ordinary walls and structural gaps that absorb higher
+            frequencies.</li>
+          </ul>
+          <p class="src">InterNoise 2014, “Adapting a propeller noise model for aircraft at cruising
+          altitudes” — <a href="http://www.acoustics.asn.au/conference_proceedings/INTERNOISE2014/papers/p791.pdf">acoustics.asn.au (PDF)</a>;
+          Buckingham &amp; Richardson, “A light aircraft as a low-frequency sound source,”
+          <a href="http://www.scielo.cl/scielo.php?script=sci_arttext&pid=S0717-65382004000200013">SciELO</a>;
+          ISO 226 / equal-loudness data via <a href="https://aes.org/resources/audio-topics/loudness-project/learn-more/">AES</a>.</p>
+        </article>
+
+        <article class="claim">
+          <div class="claim-head">
+            <h3>2 · The curve’s shape encodes speed, distance — and manoeuvres</h3>
+            <span class="badge b-good">Supported</span>
+          </div>
+          <p>This is not a new discovery; it is an established, published estimation method. The standard
+          formulation fits a four-parameter model — speed, source frequency, CPA time, CPA slant range —
+          to the instantaneous-frequency curve read off a spectrogram.</p>
+          <ul>
+            <li><strong>Ferguson (1992)</strong> estimated a propeller aircraft’s altitude and speed from a
+            <em>single ground microphone</em> by fitting a Doppler model to the blade-rate variation,
+            validated against the aircraft’s own records at 250–1,500 ft and 150–250 kt.</li>
+            <li><strong>Seppi, Tape &amp; Fee (2025)</strong> give the explicit recipe: the difference
+            between approaching and receding frequencies yields speed, and the <em>slope of the curve at
+            CPA</em> yields d₀, the slant distance at closest approach.</li>
+            <li>A US patent on acoustic airport surveillance describes the same processing: Doppler CPA
+            analysis “provides estimates of time at the closest point of approach, as well as slant range
+            and speed.”</li>
+            <li><strong>Deviations are signal, not noise.</strong> Received frequency is a direct function
+            of radial velocity at emission, so any turn, acceleration, or RPM change necessarily reshapes
+            the curve. Seppi et al. could even detect RPM differences between a climbing and a descending
+            flightseeing aircraft.</li>
+          </ul>
+          <p class="src">Ferguson, J. Acoust. Soc. Am. 92(3):1403–1407 (1992) —
+          <a href="https://www.mendeley.com/catalogue/2cd19f7e-cbeb-3f50-a337-e7046f815359/">abstract</a>;
+          Seppi et al., <em>The Seismic Record</em> (2025) —
+          <a href="https://pubs.geoscienceworld.org/ssa/tsr/article/5/4/330/688104/Classification-of-Aircraft-Types-Using-Seismic">article</a> and
+          <a href="https://gsw.silverchair-cdn.com/gsw/Content_public/Journal/tsr/5/4/10.1785_0320250035/2/tsr-2025035_supplement.pdf?Expires=1788722242&Signature=pxym4Hd8KL3s3ZnXtws3MiGbPMRnFDcwbOY1BRcXh7ZblGbuqZl7PPskZR3vDONXf~Q1WcE5nmGgllPFVBY6uxM8rEymLaElh8b81mPjPdlP6NS9RUylNhOivRb609SgofZ7saxmlOSVWj~ggsgqhjRru8pMFMkG6hHr2ExiabXjKZvQKh797dkak1KforVLtzF~Re6VCB-oafq-DGuzHNDtGh7xlDVaj6hdZYnvCLCgPHh11qmLd0Hfadsyhr-oHislriiYa7HYf6~aB2jLSsHYpPQTM73ZpVYHC5qJr9xbVNdkjaSoEeLmNEKGjedADGo69bVCyNJ9fQbb5i5bBQ__&Key-Pair-Id=APKAIE5G5CRDK6RD3PGA">supplement (PDF)</a>;
+          US Patent 8,059,489 — <a href="http://patents.justia.com/patent/8059489">Justia</a>.</p>
+        </article>
+
+        <article class="claim">
+          <div class="claim-head">
+            <h3>3 · You must model the sound at emission time, not reception time</h3>
+            <span class="badge b-good">Supported</span>
+          </div>
+          <p>Standard aeroacoustics. Sound received now was emitted earlier, from where the source
+          <em>was</em> — the retarded-time relation t<sub>ret</sub> = t − |x − y(t<sub>ret</sub>)|/c has to
+          be solved, not approximated away. Because slant range changes by kilometres across a flyover,
+          propagation delay changes by seconds across the event; at 50–70 m/s the aircraft moves hundreds
+          of metres during the delay. Seppi et al.’s forward model makes the consequence concrete: the
+          observed curve is a <em>warped</em>, not merely translated, version of the emission-time curve —
+          which is what the interactive model above shows. The video’s description confirms the creator
+          did exactly this (“emission-time radial velocity from interpolated ADS-B data”), and his
+          emphasis on it is justified.</p>
+          <p class="src">Embry-Riddle, “Aeroacoustics of Flight Vehicles” —
+          <a href="https://eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/noise-of-flight-vehicles/">eaglepubs.erau.edu</a>;
+          Casalino (2003), J. Sound &amp; Vibration 261 —
+          <a href="https://acoustique.ec-lyon.fr/publi/casalino_jsv03a.pdf">acoustique.ec-lyon.fr (PDF)</a>.</p>
+        </article>
+
+        <article class="claim">
+          <div class="claim-head">
+            <h3>4 · ADS-B archives: “essentially all flights,” purchasable, prop/jet by type code</h3>
+            <span class="badge b-part">Partially supported</span>
+          </div>
+          <p><strong>What’s real:</strong> ADS-B broadcasts position, altitude, speed and identity roughly
+          every second; ADS-B Exchange archives global snapshots every 5 s since March 2020, plus per-aircraft
+          and 2 Hz “hires” traces, and historical data is a commercial product. Prop-vs-jet mapping is
+          straightforward — ICAO Doc 8643 type designators carry an engine character (P = piston,
+          T = turboprop/turboshaft, J = jet; e.g. C172 = L1P, A320 = L2J) — and the video says it used
+          exactly that.</p>
+          <p><strong>Where it overstates:</strong></p>
+          <ul>
+            <li><strong>“Essentially all flights” is too strong.</strong> Under 14 CFR 91.225, ADS-B Out is
+            required only in Class A, B and C airspace, the 30 NM Mode C veil, and Class E at/above
+            10,000 ft MSL. Below 10,000 ft outside that airspace it isn’t required, and aircraft without an
+            engine-driven electrical system are exempt — and the small piston aircraft that make the loudest
+            low flyovers are precisely the segment most likely to be unequipped outside rule airspace.</li>
+            <li><strong>Coverage gaps.</strong> Crowdsourced receiver networks have line-of-sight, terrain
+            and density limits; a low aircraft in rural or mountainous country can be clearly audible
+            overhead and absent from trackers.</li>
+            <li><strong>Purchase has friction today.</strong> ADS-B Exchange now sells only ongoing
+            subscriptions with minimum annual commitments — “does not offer one-time data extracts or
+            project-based access.” Free alternatives exist (see Claim 9).</li>
+            <li><strong>One nuance cuts in the method’s favour:</strong> FAA LADD/PIA blocking scrubs the
+            FAA feed and participating trackers, but per the FAA it “does not impact the ADS-B broadcast
+            data” — unfiltered crowdsourced networks still capture those aircraft. It doesn’t help for
+            aircraft with no ADS-B at all, or military traffic with transponders off.</li>
+          </ul>
+          <p class="src">ADS-B Exchange, <a href="https://www.adsbexchange.com/data-products/">Data Products</a> and
+          <a href="https://www.adsbexchange.com/data-products/sample-data/">Sample Data</a>;
+          14 CFR 91.225 scope — <a href="https://legalclarity.org/where-is-ads-b-out-required-airspace-rules-explained/">legalclarity.org</a>;
+          ICAO type descriptions — <a href="https://knowledgebase.vatsim-germany.org/books/aircraft-knowledge/page/icao-type-description">VATSIM Germany KB</a>.</p>
+        </article>
+
+        <article class="claim">
+          <div class="claim-head">
+            <h3>5 · The earlier thunder-sound geolocation, at ~5 km precision</h3>
+            <span class="badge b-part">Partially supported</span>
+          </div>
+          <p>Both predecessor videos exist: “Can you geolocate a video using background thunder sounds?”
+          (418K views) and “I located a fan’s video using thunder sounds” (90K views). The first modelled
+          the acoustic envelope of lightning strikes (logged from the Blitzortung / lightningmaps.org feed
+          over ~3 weeks) against the recording’s band-passed RMS envelope by FFT cross-correlation, and was
+          “validated blind against a known location.” The fan video’s description gives the concrete
+          number: <strong>2.2 km</strong> error, limited by the public Blitzortung dataset’s ~3 km strike
+          deviation, with ~500 m judged feasible given strikes from multiple directions and better data.</p>
+          <p>The specific “~5 km” figure for the first video could not be verified — no transcript or
+          description states a final error. It’s the right order of magnitude given the 2.2 km result and
+          the ~3 km dataset floor, but as a precise number it is <strong>unverifiable</strong> from
+          accessible sources.</p>
+          <p class="src">Channel listing — <a href="https://clipzag.com/channel?id=UCyeWuyC3eSJgmOEyDCpZbPw">clipzag.com</a>;
+          thunder videos — <a href="https://clipzag.com/watch?v=SnbkIm56TfI">SnbkIm56TfI</a>,
+          <a href="https://clipzag.com/watch?v=6a7Z0I3LAnE">6a7Z0I3LAnE</a>.</p>
+        </article>
+
+        <article class="claim">
+          <div class="claim-head">
+            <h3>9 · Feasibility: what replication actually takes</h3>
+            <span class="badge b-good">Feasible, with caveats</span>
+          </div>
+          <p>The economics have quietly flipped in the method’s favour, because free ADS-B history now
+          exists. adsb.lol publishes a full global day free (ODbL): daily tarballs of 1.6–1.8 GB,
+          converting to ~45 parquet files of ~1M records each (~45M records/day). The “~50 GB of parquet
+          for one day” figure is plausible for the fuller commercial feed (ADS-B Exchange’s stream runs to
+          ~1.2 billion records/day) but it is not a floor — a usable global day is ~2 GB compressed from
+          the free source. The forward model itself is analytic and cheap (Seppi et al. fitted 1,193
+          crossings with a 5-parameter model), and the creator’s filter-then-score recipe — velocity/CPA
+          pre-filter, then the inter-flyover time offset, then forward-scoring survivors on a 200 m grid —
+          reduces a continental search to a tractable Python pipeline. No exotic hardware is implied by
+          any source.</p>
+          <p><strong>Required inputs:</strong> the recording’s date; at least one — in the main demo two,
+          920 s apart — sufficiently close prop flyovers during the clip; audio that retains the ~100 Hz
+          region. The second demo additionally had known time of day and needed only 1 minute / one
+          flyover.</p>
+          <p class="src">adsb.lol data scale and hobbyist DuckDB/parquet analysis —
+          <a href="https://tech.marksblogg.com/global-flight-tracking-adsb.html">tech.marksblogg.com</a>;
+          feed comparison — <a href="https://github.com/ClickHouse/adsb.exposed">ClickHouse adsb.exposed</a>.</p>
+        </article>
+      </section>
+
+      <section id="prior-art">
+        <h2>Prior art: new trick, or old science?</h2>
+        <p>The components are 30+ years old in the literature. What appears genuinely new is the
+        <em>inversion</em> — locating an unknown consumer recording by matching its Doppler curves against
+        archived flight tracks over a continent. No published prior demonstration of that exact inversion
+        was found.</p>
+        <ul>
+          <li><strong>1992 — single-microphone Doppler estimation.</strong> Ferguson estimates a prop
+          aircraft’s speed and altitude from one ground microphone (Claim 2). Closed-form solutions
+          followed (Timlelt et al., 2017), as did microphone-array trajectory estimation (Tong et al.,
+          JASA 2016).</li>
+          <li><strong>2002–2004 — the Doppler comb as a measuring instrument.</strong> Buckingham et al.
+          used propeller Doppler combs to measure sediment sound speed in the ocean.</li>
+          <li><strong>2013 — the forensic cousin.</strong> Electric Network Frequency (ENF) analysis
+          timestamps and authenticates recordings from mains hum and is used by the Metropolitan Police
+          Forensic Audio Lab; Garg, Hajj-Ahmad &amp; Wu (ICASSP 2013) explicitly proposed
+          <em>geo-location estimation from ENF signals</em>. “Inaudible background signature leaks
+          time/place” is an established forensic research programme.</li>
+          <li><strong>2020 — institutional money.</strong> The US National Geospatial-Intelligence Agency’s
+          Soundscapes Competition paid ~$100K for algorithms to geolocate recordings from ambient sound
+          (city-level classification).</li>
+          <li><strong>2025 — the closest analogue.</strong> Seppi, Tape &amp; Fee analysed 303
+          seismometers and 1,216 known flights across 48 types, estimating flight parameters from Doppler
+          curves and checking them against Flightradar24 ground truth. The difference: their sensors’
+          locations were known and the goal was identifying the <em>aircraft</em>; colsto inverts it to
+          find the <em>recorder</em>. Published about a year before the video.</li>
+        </ul>
+        <p><strong>Reaction so far:</strong> within the first day, Hacker News carried the video twice
+        (32 points and 9 points); the visible comments were enthusiastic and uncritical (“the coolest thing
+        I’ve ever seen on YouTube”; “I would assume the three letter agencies have been using this
+        forever”). It was also posted to Lobsters. No tech-press article, expert critique, or sceptical
+        analysis was found in news, Reddit, or X-indexed sources within ~24 hours — flag that as
+        time-limited: absence on day one is not absence of later scrutiny.</p>
+        <p class="src">Seppi et al. press release —
+        <a href="https://www.eurekalert.org/news-releases/1106534">EurekAlert</a>;
+        ENF geolocation — <a href="https://terpconnect.umd.edu/~minwu/public_paper/Conf13/1305_ENFLocalize_icassp13.pdf">Garg et al., ICASSP 2013 (PDF)</a>;
+        NGA Soundscapes — <a href="https://www.nga.mil/news/NGA_announces_winners_of_$100000_Soundscapes_Compe.html">nga.mil</a>;
+        HN reaction — <a href="https://hn.algolia.com/api/v1/search?query=UytYrhYLOKI">Algolia search</a>.</p>
+      </section>
+
+      <section id="creator">
+        <h2>The creator: who is “colsto”?</h2>
+        <p><span class="badge b-mixed">Mixed</span></p>
+        <p>A pseudonymous creator in the cybersecurity/OSINT niche (a TryHackMe sponsorship runs in the
+        thunder fan video). No real name or institutional affiliation surfaced in any search. The track
+        record is substantial and unusually well documented: “I geolocated an animal abuse video using
+        OSINT” (2.7M views), “Andrew Tate challenged me to find him…” (879K), the One Piece ocean-drop
+        video (613K), the two thunder videos (418K / 90K), and a Primitive Technology location video (26K),
+        plus photo-geolocation tutorials. His video descriptions are unusually transparent about method —
+        a credibility plus.</p>
+        <div class="twocol">
+          <div>
+            <h3 style="margin-top:14px;">In his favour</h3>
+            <ul>
+              <li><strong>Independent coverage:</strong> Boing Boing covered the animal-abuse geolocation
+              (Jul 2026); that video documents a serious methodology — ~80k candidate T-junctions filtered
+              to ~20k, Street View plus CLIP/SigLIP two-pass scoring — and follow-through with vet
+              practices and the RSPCA.</li>
+              <li><strong>Independent replication:</strong> an unrelated developer re-implemented the
+              thunder method as an open-source tool, <em>thunderprint</em> (PyPI), crediting colsto’s
+              videos as the baseline method.</li>
+              <li><strong>No debunking found</strong> of any of his work.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin-top:14px;">Cautions</h3>
+            <ul>
+              <li><strong>Credit overlap:</strong> press coverage of the One Piece ocean-drop location
+              credits a Reddit user, XilLive, with the Suruga Bay deduction — not colsto. His own video
+              claiming the find has no independent verification found; the two claims coexist.</li>
+              <li><strong>Unconfirmed pinpoints:</strong> no independent confirmation was found that his
+              Primitive Technology location (a deliberately location-secret site in Far North Queensland)
+              was correct.</li>
+              <li><strong>The flagship result can’t be audited:</strong> for the aircraft video he releases
+              no code or data, and there is no peer review of any of it.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="src">Boing Boing coverage via <a href="https://muckrack.com/grant-st-clair/articles">Muck Rack</a>;
+        thunderprint — <a href="https://pypi.org/project/thunderprint/">pypi.org</a>;
+        One Piece credit — <a href="https://www.Ladbible.com/entertainment/tv/one-piece-secret-bottom-ocean-viral-reddit-028515-20260304">LADbible</a>,
+        <a href="https://www.gamesradar.com/entertainment/anime-shows/one-piece-fans-think-theyve-found-the-real-life-location-of-the-one-piece-in-under-12-hours-despite-oda-burying-it-600m-underwater/">GamesRadar</a>.</p>
+      </section>
+
+      <section id="defenses">
+        <h2>Do the defenses work?</h2>
+
+        <h3>(a) “Just high-pass filter it” — <span class="badge b-part">Unreliable as a casual fix</span></h3>
+        <p>The prop fundamental (~100–130 Hz) sits <em>inside</em> the voice pitch range — adult male
+        speech runs 85–180 Hz, female 165–255 Hz — so any high-pass gentle enough to keep voice sounding
+        natural (cutoff ≲100 Hz, the typical 6–12 dB/octave “rumble filter”) leaves the fundamental largely
+        intact. And the harmonics are the loophole in the other direction: blade-pass harmonics at 2×, 3×,
+        4× (200–520+ Hz) are Doppler-shifted copies of the same curve, and the published methods work from
+        <em>any</em> clean harmonic. Even a telephone-style 300 Hz high-pass — which would kill the
+        fundamental and damage voice naturalness — leaves the 3rd and higher harmonics carrying the full
+        Doppler shape. Removing all of them means filtering away most of the speech band itself.</p>
+        <p>Where the video overreaches: harmonics diminish in amplitude and suffer more atmospheric
+        absorption over distance, so a steep, deliberately chosen filter chain would in practice defeat
+        <em>distant, faint</em> flyovers. “Not reliable as a casual fix” is supported; “cannot be filtered”
+        would not be.</p>
+
+        <h3>(b) “Talk over it” — <span class="badge b-good">Doesn’t block extraction</span></h3>
+        <p>Extraction happens in the frequency domain: a persistent narrowband tone occupies specific
+        spectrogram bins for tens of seconds while speech is broadband and time-varying, and log-scale
+        spectrograms compress dynamic range so weak narrowband components stay visible alongside loud ones.
+        It’s the same reason ENF analysts routinely pull a faint 50/60 Hz hum out from under speech. The
+        limits the video doesn’t stress: clipping/saturation, aggressive automatic gain control, or a
+        foreground that is itself a loud sustained tone in the same bins would break it.</p>
+
+        <h3>(c) Phone calls: codecs and noise suppression — <span class="badge b-part">Plausible for codecs; unverified for suppression</span></h3>
+        <p>This is the video’s softest claim. For codecs alone it’s plausible: the EVS codec’s only built-in
+        high-pass is at ~20 Hz and it supports fullband audio (20 Hz–20 kHz) designed for generic audio as
+        well as speech; Opus fullband likewise codes from near-DC to 20 kHz. Neither inherently strips a
+        100–130 Hz tone. Noise suppression cuts the other way, though: classical spectral subtraction and
+        RNNoise-style suppressors are specifically designed to remove steady non-speech tones — tool
+        documentation says steady noise (fan, AC, mains hum) “goes almost completely.” A Doppler tone is,
+        however, <em>non-stationary</em> — it sweeps ±15–20% in frequency across the pass — which
+        stationary-noise estimators track poorly, and suppression is app- and device-dependent, often
+        absent or mild. No published experiment was found that runs a real flyover recording through
+        Opus/EVS plus production noise suppression and measures curve survival. The creator’s in-video test
+        is currently the only evidence: treat as <strong>unverified</strong>.</p>
+        <p class="src">EVS codec white paper (Nokia) — <a href="https://www.nokia.com/asset/f/200002/">nokia.com</a>;
+        Opus settings (Xiph) — <a href="https://wiki.xiph.org/index.php?title=Opus_Recommended_Settings&oldid=16497">wiki.xiph.org</a>;
+        RNNoise behaviour — <a href="https://stayput.dev/remove-background-noise-from-audio">stayput.dev</a>.</p>
+      </section>
+
+      <section id="limits">
+        <h2>Limits &amp; failure modes</h2>
+        <p>The method is real but brittle: it needs the sky, the archive, and the recording chain to all
+        cooperate. The honest failure list:</p>
+        <div class="fail-list">
+          <div class="fail-item">
+            <b>1 · The plane isn’t in the data — the biggest hole</b>
+            <p>Non-equipped GA outside rule airspace, transponder-off traffic, and low-altitude/rural
+            receiver gaps silently remove candidate flyovers. The plane you hear may simply not exist in
+            the archive.</p>
+          </div>
+          <div class="fail-item">
+            <b>2 · The atmosphere doesn’t read the textbook</b>
+            <p>Effective sound speed varies with temperature and wind profile (Seppi et al. used a modelled
+            320 m/s, not 343); refraction creates acoustic shadow zones where a geometrically close flyover
+            is inaudible, and turbulence smears the spectral lines the method reads.</p>
+          </div>
+          <div class="fail-item">
+            <b>3 · The recording chain</b>
+            <p>Phone hardware is mostly innocent — a peer-reviewed study found tested phones
+            <em>emphasise</em> 85–140 Hz and roll off only below ~30 Hz. The real risks are app-level:
+            voice-recorder high-pass and noise suppression, AGC, wind noise (broadband, concentrated at low
+            frequencies, masking exactly the band of interest), and platform re-encoding. YouTube’s Opus
+            (~128 kbps, fullband) should preserve the tone reasonably; aggressive short-form pipelines are
+            untested.</p>
+          </div>
+          <div class="fail-item">
+            <b>4 · Ambiguity with weak inputs</b>
+            <p>One flyover constrains the recorder only to a locus of positions consistent with a single
+            (speed, CPA-distance, CPA-time) triple. The headline precision came from <em>two</em> events
+            with a fixed 920 s offset plus a silence constraint — or, in the second demo, from known time
+            of day. One faint flyover with unknown time is a much weaker problem.</p>
+          </div>
+          <div class="fail-item">
+            <b>5 · RPM instability</b>
+            <p>Prop RPM — hence the fundamental — shifts with climb, descent and power settings. That both
+            adds signal (Claim 2) and breaks naive constant-frequency curve extraction.</p>
+          </div>
+        </div>
+        <p class="src">Smartphone microphone response — Awan et al., J. Voice,
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10545813/">PMC</a>;
+        refraction/shadow zones — <a href="https://repository.hkust.edu.hk/ir/bitstream/1783.1-132634/1/132634.pdf">Wu &amp; Redonnet (PDF)</a>.</p>
+      </section>
+
+      <section id="implications">
+        <h2>Implications &amp; applications</h2>
+        <h3>Privacy: audio is location data</h3>
+        <p>The deepest implication is the one in the title: a recording’s <em>background</em> can carry its
+        location even when nothing in the foreground does, and even when the carrier sound is inaudible to
+        the person who made the recording. Anyone who publishes audio or video recorded outdoors — or near
+        a window — in airspace with ADS-B coverage may be publishing a latent location fix, recoverable
+        after the fact from public archives, at hobbyist cost. Stripping metadata does not touch this;
+        the leak is in the waveform itself. The casual defenses people reach for (a rumble filter, talking
+        over it) don’t reliably close it, per Claim 8.</p>
+        <h3>Forensics and verification</h3>
+        <p>The same property is a tool. The technique slots into an existing forensic family alongside ENF
+        analysis: background signatures that timestamp and place recordings. Plausible uses include
+        verifying or challenging the claimed origin of leaked or contested audio, corroborating
+        whistleblower and conflict-zone recordings, and checking alibis — the creator’s own earlier work
+        (locating an animal-abuse video, with follow-through to animal-welfare authorities) shows the
+        OSINT pattern. Intelligence interest in exactly this capability is documented: NGA paid prize
+        money for ambient-audio geolocation in 2020.</p>
+        <h3>Science and sensing</h3>
+        <p>Run in the forward direction — sensors of known location — the same curves are already doing
+        science: Seppi et al. classified aircraft types and flight behaviour from 303 seismometers, and
+        the Doppler comb has been used as an oceanographic sound source since 2002. Every phone recording
+        is, in principle, a node in a passive acoustic sensor network nobody deployed on purpose.</p>
+        <h3>What would settle it</h3>
+        <p>The gap between “the physics is proven” and “the ~100 m continent-wide demo is proven” is one
+        replication wide. The creator withholds his code, but nothing about the method is secret: the
+        recipe is in his description, the data is free from adsb.lol, and the fitting literature is
+        published. An independent replication — or a failed one — is the single most informative next
+        event, and the thunder method’s history (independently re-implemented as open source) suggests
+        this creator’s methods do get picked up and tested.</p>
+      </section>
+
+      <section id="open">
+        <h2>Open questions — what could not be verified</h2>
+        <div class="open-q">
+          <ul>
+            <li>The <strong>~100 m final accuracy</strong> and the “true location ranked 1st, US-wide”
+            result — asserted only in the video/description; no code, data, or independent replication
+            exists yet.</li>
+            <li>The exact <strong>“~5 km”</strong> figure for the first thunder video.</li>
+            <li><strong>Codec + noise-suppression survival</strong> as a general claim — no independent
+            experimental source found.</li>
+            <li>The creator’s <strong>real identity and credentials</strong>, and independent confirmation
+            of the Primitive Technology and One Piece pinpoints.</li>
+            <li>Any <strong>expert scepticism</strong> of the new video — none found within ~24 h of
+            publication (HN comments were enthusiastic); worth re-checking as scrutiny develops.</li>
+            <li>Whether the main demo’s reference recording was the creator’s own staged recording or a
+            third party’s — the ground-truth procedure could not be independently confirmed from text
+            sources.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="sources">
+        <h2>Sources</h2>
+        <ol class="sources">
+          <li>Video under review (description/methodology) — <a href="https://www.youtube.com/watch?v=UytYrhYLOKI">youtube.com/watch?v=UytYrhYLOKI</a></li>
+          <li>Channel listing (titles, view counts) — <a href="https://clipzag.com/channel?id=UCyeWuyC3eSJgmOEyDCpZbPw">clipzag.com/channel?id=UCyeWuyC3eSJgmOEyDCpZbPw</a></li>
+          <li>InterNoise 2014, propeller noise model — <a href="http://www.acoustics.asn.au/conference_proceedings/INTERNOISE2014/papers/p791.pdf">acoustics.asn.au (PDF)</a></li>
+          <li>Buckingham &amp; Richardson, light aircraft low-frequency source — <a href="http://www.scielo.cl/scielo.php?script=sci_arttext&pid=S0717-65382004000200013">scielo.cl</a></li>
+          <li>Ferguson 1992, JASA — <a href="https://www.mendeley.com/catalogue/2cd19f7e-cbeb-3f50-a337-e7046f815359/">mendeley.com</a></li>
+          <li>Seppi, Tape &amp; Fee 2025, The Seismic Record — <a href="https://pubs.geoscienceworld.org/ssa/tsr/article/5/4/330/688104/Classification-of-Aircraft-Types-Using-Seismic">pubs.geoscienceworld.org</a>; press release — <a href="https://www.eurekalert.org/news-releases/1106534">eurekalert.org</a></li>
+          <li>US Patent 8,059,489 — <a href="http://patents.justia.com/patent/8059489">patents.justia.com</a></li>
+          <li>Saravanakumar et al., acoustic vector sensor localization — <a href="https://www.joast.org/index.php/joast/article/download/434/411/825">joast.org (PDF)</a></li>
+          <li>Timlelt et al. 2017, closed-form Doppler estimation — <a href="https://www.sciencedirect.com/science/article/pii/S1051200416302238">sciencedirect.com</a></li>
+          <li>ERAU aeroacoustics (retarded time) — <a href="https://eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/noise-of-flight-vehicles/">eaglepubs.erau.edu</a></li>
+          <li>Casalino 2003, advanced time approach — <a href="https://acoustique.ec-lyon.fr/publi/casalino_jsv03a.pdf">acoustique.ec-lyon.fr (PDF)</a></li>
+          <li>ADS-B Exchange — <a href="https://www.adsbexchange.com/data-products/">Data Products</a>; <a href="https://www.adsbexchange.com/data-products/sample-data/">Sample Data</a></li>
+          <li>14 CFR 91.225 scope — <a href="https://legalclarity.org/where-is-ads-b-out-required-airspace-rules-explained/">legalclarity.org</a></li>
+          <li>LADD limits — <a href="https://uasnewsus.com/articles/faa-safety-mandate-weather-tax-tool-la-county-adsb-aircraft-discovery-program">uasnewsus.com</a>; <a href="https://ops.group/blog/are-you-ads-being-watched/?replytocom=108776">ops.group</a></li>
+          <li>ADS-B coverage gaps — <a href="https://avgeek.ph/why-you-sometimes-hear-aircraft-overhead-but-dont-see-them-on-flight-tracking-websites/">avgeek.ph</a>; OpenSky Report 2025 — <a href="https://arxiv.org/html/2505.06254v1">arxiv.org</a></li>
+          <li>ICAO type descriptions — <a href="https://knowledgebase.vatsim-germany.org/books/aircraft-knowledge/page/icao-type-description">knowledgebase.vatsim-germany.org</a>; <a href="https://trrrj.ansperformance.eu/reference/aircrafttype.html">trrrj.ansperformance.eu</a></li>
+          <li>adsb.lol scale / hobbyist analysis — <a href="https://tech.marksblogg.com/global-flight-tracking-adsb.html">tech.marksblogg.com</a>; <a href="https://github.com/ClickHouse/adsb.exposed">github.com/ClickHouse/adsb.exposed</a></li>
+          <li>ENF geolocation — <a href="https://terpconnect.umd.edu/~minwu/public_paper/Conf13/1305_ENFLocalize_icassp13.pdf">Garg et al., ICASSP 2013 (PDF)</a>; ENF explainer — <a href="https://robertheaton.com/enf/?ref=the-browser">robertheaton.com</a></li>
+          <li>NGA Soundscapes — <a href="https://www.nga.mil/news/NGA_announces_winners_of_$100000_Soundscapes_Compe.html">nga.mil</a>; <a href="https://www.defensenews.com/industry/techwatch/2020/10/23/the-ambient-audio-in-your-video-could-give-away-its-location-this-intelligence-agency-wants-to-use-that/">defensenews.com</a></li>
+          <li>thunderprint — <a href="https://pypi.org/project/thunderprint/">pypi.org/project/thunderprint</a></li>
+          <li>EVS white paper (Nokia) — <a href="https://www.nokia.com/asset/f/200002/">nokia.com</a>; Opus settings — <a href="https://wiki.xiph.org/index.php?title=Opus_Recommended_Settings&oldid=16497">wiki.xiph.org</a></li>
+          <li>Noise-suppression behaviour — <a href="https://stayput.dev/remove-background-noise-from-audio">stayput.dev</a>; <a href="https://audiosaw.com/noise-reduction">audiosaw.com</a></li>
+          <li>Smartphone microphone response (J. Voice) — <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10545813/">pmc.ncbi.nlm.nih.gov</a></li>
+          <li>Hearing threshold / equal loudness — <a href="https://aes.org/resources/audio-topics/loudness-project/learn-more/">aes.org</a></li>
+          <li>Hacker News reaction — <a href="https://hn.algolia.com/api/v1/search?query=UytYrhYLOKI">hn.algolia.com</a></li>
+          <li>Boing Boing coverage (via Muck Rack) — <a href="https://muckrack.com/grant-st-clair/articles">muckrack.com</a></li>
+          <li>One Piece press credit — <a href="https://www.Ladbible.com/entertainment/tv/one-piece-secret-bottom-ocean-viral-reddit-028515-20260304">Ladbible.com</a>; <a href="https://www.gamesradar.com/entertainment/anime-shows/one-piece-fans-think-theyve-found-the-real-life-location-of-the-one-piece-in-under-12-hours-despite-oda-burying-it-600m-underwater/">gamesradar.com</a></li>
+          <li>Atmospheric refraction / shadow zones — <a href="https://repository.hkust.edu.hk/ir/bitstream/1783.1-132634/1/132634.pdf">repository.hkust.edu.hk (PDF)</a></li>
+        </ol>
+      </section>
+
+      <footer>
+        <p>Investigation compiled 3 Nov 2026 from the published literature and primary sources linked
+        above; verdicts reflect evidence available within ~24 hours of the video’s publication and may
+        need revisiting as independent replication or expert review appears. The interactive curve is an
+        idealised forward model for illustration, not measured data.</p>
+      </footer>
+
+    </div>
+
+    <script>
+      (function () {
+        var C = 343; // speed of sound, m/s
+        var svg = document.getElementById('chart');
+        var NS = 'http://www.w3.org/2000/svg';
+        var W = 720, H = 340, padL = 52, padR = 16, padT = 18, padB = 40;
+        var plotW = W - padL - padR, plotH = H - padT - padB;
+
+        var rSpeed = document.getElementById('r-speed');
+        var rDist = document.getElementById('r-dist');
+        var rFreq = document.getElementById('r-freq');
+
+        function el(name, attrs) {
+          var e = document.createElementNS(NS, name);
+          for (var k in attrs) e.setAttribute(k, attrs[k]);
+          return e;
+        }
+
+        function radialVel(tau, v, d0) {
+          var R = Math.sqrt(d0 * d0 + v * v * tau * tau);
+          return v * v * tau / R;
+        }
+
+        function draw() {
+          var v = parseFloat(rSpeed.value);       // m/s
+          var d0 = parseFloat(rDist.value);       // m
+          var f0 = parseFloat(rFreq.value);       // Hz
+
+          document.getElementById('o-speed').textContent = v.toFixed(0) + ' m/s (' + Math.round(v * 3.6) + ' km/h)';
+          document.getElementById('o-dist').textContent = d0 >= 1000 ? (d0 / 1000).toFixed(1) + ' km' : d0.toFixed(0) + ' m';
+          document.getElementById('o-freq').textContent = f0.toFixed(0) + ' Hz';
+
+          // Emission-time parametrisation: tau = emission time rel. to CPA emission.
+          var tauMax = Math.max(60, (4.5 * d0) / v); // enough for curve to flatten
+          var N = 240;
+          var ptsEmit = [], ptsNaive = [];
+          var tMin = Infinity, tMax = -Infinity, fMin = Infinity, fMax = -Infinity;
+          for (var i = 0; i <= N; i++) {
+            var tau = -tauMax + (2 * tauMax * i) / N;
+            var R = Math.sqrt(d0 * d0 + v * v * tau * tau);
+            var tRec = tau + R / C;                       // reception time
+            var fE = f0 * C / (C + radialVel(tau, v, d0)); // correct: emission-time velocity
+            var fN = f0 * C / (C + radialVel(tRec, v, d0)); // naive: reception-time velocity
+            ptsEmit.push([tRec, fE]);
+            ptsNaive.push([tRec, fN]);
+            tMin = Math.min(tMin, tRec); tMax = Math.max(tMax, tRec);
+            fMin = Math.min(fMin, fE, fN); fMax = Math.max(fMax, fE, fN);
+          }
+          var fPad = (fMax - fMin) * 0.18 + 1;
+          fMin -= fPad; fMax += fPad;
+
+          function X(t) { return padL + ((t - tMin) / (tMax - tMin)) * plotW; }
+          function Y(f) { return padT + (1 - (f - fMin) / (fMax - fMin)) * plotH; }
+          function path(pts) {
+            var s = '';
+            for (var i = 0; i < pts.length; i++) {
+              s += (i === 0 ? 'M' : 'L') + X(pts[i][0]).toFixed(1) + ',' + Y(pts[i][1]).toFixed(1) + ' ';
+            }
+            return s;
+          }
+
+          while (svg.firstChild) svg.removeChild(svg.firstChild);
+          var cs = getComputedStyle(document.documentElement);
+          var grid = cs.getPropertyValue('--chart-grid').trim();
+          var ink3 = cs.getPropertyValue('--ink-3').trim();
+          var curveA = cs.getPropertyValue('--chart-curve').trim();
+          var curveB = cs.getPropertyValue('--chart-curve2').trim();
+
+          // Horizontal gridlines + y labels (5 ticks)
+          for (var g = 0; g <= 4; g++) {
+            var f = fMin + (fMax - fMin) * g / 4;
+            var y = Y(f);
+            svg.appendChild(el('line', { x1: padL, y1: y, x2: W - padR, y2: y, stroke: grid, 'stroke-width': 1 }));
+            var t = el('text', { x: padL - 8, y: y + 4, 'text-anchor': 'end', 'font-size': 12, fill: ink3 });
+            t.textContent = f.toFixed(0);
+            svg.appendChild(t);
+          }
+          // Vertical gridlines + x labels (5 ticks)
+          for (var g2 = 0; g2 <= 4; g2++) {
+            var tt = tMin + (tMax - tMin) * g2 / 4;
+            var x = X(tt);
+            svg.appendChild(el('line', { x1: x, y1: padT, x2: x, y2: H - padB, stroke: grid, 'stroke-width': 1 }));
+            var tx = el('text', { x: x, y: H - padB + 20, 'text-anchor': 'middle', 'font-size': 12, fill: ink3 });
+            tx.textContent = (tt >= 0 ? '+' : '') + tt.toFixed(0) + 's';
+            svg.appendChild(tx);
+          }
+          // True-frequency reference line
+          svg.appendChild(el('line', { x1: padL, y1: Y(f0), x2: W - padR, y2: Y(f0), stroke: ink3, 'stroke-width': 1, 'stroke-dasharray': '5 5' }));
+          var tf = el('text', { x: W - padR - 4, y: Y(f0) - 6, 'text-anchor': 'end', 'font-size': 12, fill: ink3 });
+          tf.textContent = 'true tone ' + f0.toFixed(0) + ' Hz';
+          svg.appendChild(tf);
+          // Axis captions
+          var yl = el('text', { x: 14, y: padT + plotH / 2, 'text-anchor': 'middle', 'font-size': 12, fill: ink3, transform: 'rotate(-90 14 ' + (padT + plotH / 2) + ')' });
+          yl.textContent = 'received frequency (Hz)';
+          svg.appendChild(yl);
+          var xl = el('text', { x: padL + plotW / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 12, fill: ink3 });
+          xl.textContent = 'time relative to closest approach (s)';
+          svg.appendChild(xl);
+
+          // Curves: naive first (under), emission-time on top
+          svg.appendChild(el('path', { d: path(ptsNaive), fill: 'none', stroke: curveB, 'stroke-width': 2, 'stroke-dasharray': '6 4' }));
+          svg.appendChild(el('path', { d: path(ptsEmit), fill: 'none', stroke: curveA, 'stroke-width': 2.6 }));
+
+          // Readouts
+          var fA = f0 * C / (C - v), fR = f0 * C / (C + v);
+          document.getElementById('ro-fa').textContent = fA.toFixed(1) + ' Hz';
+          document.getElementById('ro-fr').textContent = fR.toFixed(1) + ' Hz';
+          document.getElementById('ro-drop').textContent = (fA - fR).toFixed(1) + ' Hz (' + ((fA - fR) / f0 * 100).toFixed(0) + '% of tone)';
+          document.getElementById('ro-delay').textContent = (d0 / C).toFixed(1) + ' s';
+        }
+
+        [rSpeed, rDist, rFreq].forEach(function (r) { r.addEventListener('input', draw); });
+        if (window.matchMedia) {
+          var mq = window.matchMedia('(prefers-color-scheme: dark)');
+          if (mq.addEventListener) mq.addEventListener('change', draw);
+        }
+        draw();
+      })();
+    </script>
+  </body>
+</html>
